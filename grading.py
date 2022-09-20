@@ -56,8 +56,8 @@ class grader():
         '''
         if not os.path.exists('output'):
             os.makedirs('output')
-        # if os.path.exists(output_file):
-        #     return
+        if os.path.exists(output_file):
+            return
         with open(input_file, 'r') as f:
             try:
                 nb_in = nbformat.read(f, nbformat.NO_CONVERT)
@@ -122,10 +122,11 @@ class grader():
                 for qnum in student_ans:
                     if qnum in sols:
                         if student_ans[qnum]['answer'] == sols[qnum]['answer']:
-                            grades[os.path.splitext(name)[0]]['score'] += self.score[qnum]
+                            grades[student_id]['score'] += self.score[qnum]
                         else:
-                            grades[student_id]['feedback'] += '{}: wrong answer\n'.format(qnum)
-                grades[student_id]['score'] /= (sum(self.score.values()) / 100)
+                            grades[student_id]['feedback'] += '{}: wrong answer, '.format(qnum)
+                grades[student_id]['score'] /= sum(self.score.values())
+                grades[student_id]['score'] = int(grades[student_id]['score'] * 100)
         with open('grades.json', 'w') as f:
             json.dump(grades, f, indent=2)
             
@@ -133,6 +134,6 @@ class grader():
         self.save_err_msg()
         
 if __name__ == '__main__':
-    score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10, 'Q9': 10, 'Q10': 10}
+    score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10}
     g = grader(student_dir='lab1', sols_dir='sols', sols_file='sols/lab01-ans-2021.ipynb', score=score)
     g.grade(is_run=True)
