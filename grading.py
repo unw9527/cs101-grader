@@ -13,6 +13,7 @@ class grader():
         self.sols_file = sols_file
         self.score = score
         self.err_msg = []
+        self.grades = {}
     
     def save_err_msg(self):
         '''
@@ -56,15 +57,19 @@ class grader():
         '''
         if not os.path.exists('output'):
             os.makedirs('output')
-        if os.path.exists(output_file):
-            return
+        # if os.path.exists(output_file):
+        #     return
         with open(input_file, 'r') as f:
+            student_id = os.path.splitext(os.path.basename(input_file))[0]
             try:
                 nb_in = nbformat.read(f, nbformat.NO_CONVERT)
             except nbformat.reader.NotJSONError:
-                self.err_msg.append('Not a valid notebook: {}\n\n'.format(input_file))
+                # self.err_msg.append('Not a valid notebook: {}\n\n'.format(input_file))
+                self.grades[student_id] = {}
+                self.grades[student_id]['score'] = 0
+                self.grades[student_id]['feedback'] = "Invalid file"
                 return
-        ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
+        ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3', allow_errors=True)
         try:
             nb_out = ep.preprocess(nb_in, {'metadata': {'path': path}})
         except CellExecutionError:
@@ -103,7 +108,6 @@ class grader():
     def grade(self, is_run: bool = True):
         if is_run:
             self.run()
-        grades = {}
         with open(os.path.join('output', 'sols.json'), 'r') as f:
             sols = json.load(f)
         # compare sols and students' answers
@@ -116,24 +120,24 @@ class grader():
                         self.err_msg.append('Invalid JSON file "{}".\n\n'.format(os.path.join(root, name)))
                         continue
                 student_id = os.path.splitext(name)[0]
-                grades[student_id] = {}
-                grades[student_id]['score'] = 0
-                grades[student_id]['feedback'] = ''
+                self.grades[student_id] = {}
+                self.grades[student_id]['score'] = 0
+                self.grades[student_id]['feedback'] = ''
                 for qnum in student_ans:
                     if qnum in sols:
                         if student_ans[qnum]['answer'] == sols[qnum]['answer']:
-                            grades[student_id]['score'] += self.score[qnum]
+                            self.grades[student_id]['score'] += self.score[qnum]
                         else:
-                            grades[student_id]['feedback'] += '{}: wrong answer, '.format(qnum)
-                grades[student_id]['score'] /= sum(self.score.values())
-                grades[student_id]['score'] = int(grades[student_id]['score'] * 100)
+                            self.grades[student_id]['feedback'] += '{}: wrong answer; '.format(qnum)
+                self.grades[student_id]['score'] /= sum(self.score.values())
+                self.grades[student_id]['score'] = int(self.grades[student_id]['score'] * 100) + 20
         with open('grades.json', 'w') as f:
-            json.dump(grades, f, indent=2)
+            json.dump(self.grades, f, indent=2)
             
         # save all error messages
         self.save_err_msg()
         
 if __name__ == '__main__':
-    score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10}
+    score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10, 'Q9': 10, 'Q10': 10}
     g = grader(student_dir='lab1', sols_dir='sols', sols_file='sols/lab01-ans-2021.ipynb', score=score)
     g.grade(is_run=True)
