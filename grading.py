@@ -12,6 +12,15 @@ class grader():
         self.sols_dir = sols_dir
         self.sols_file = sols_file
         self.score = score
+        self.err_msg = []
+    
+    def save_err_msg(self):
+        '''
+        Save error messages to a file
+        '''
+        with open('error.txt', 'w') as f:
+            for msg in self.err_msg:
+                f.write(msg)
     
     def clean_data(self, nb: dict)-> dict:
         '''
@@ -24,15 +33,16 @@ class grader():
         regexp = re.compile(r'Q[0-9]+ \[')
         for cell in nb['cells']:
             if cell['cell_type'] == 'code' and 'outputs' in cell:
+                answer = ''
                 for output in cell['outputs']:
                     # there are two kinds of text output
                     if 'text' in output:
-                        answer = output['text']
+                        answer += output['text']
                     elif 'data' in output:
-                        answer = output['data']['text/plain']
-                    if regexp.search(cell['source']):
-                        question_num += 1
-                    new_nb['Q{}'.format(question_num)] = {'answer': answer}
+                        answer += output['data']['text/plain']
+                if regexp.search(cell['source']):
+                    question_num += 1
+                new_nb['Q{}'.format(question_num)] = {'answer': answer}
         return new_nb
         
     def run_and_save(self, input_file: str, output_file: str, path: str, timeout: int = 600):
@@ -46,22 +56,23 @@ class grader():
         '''
         if not os.path.exists('output'):
             os.makedirs('output')
-        if os.path.exists(output_file):
-            return
+        # if os.path.exists(output_file):
+        #     return
         with open(input_file, 'r') as f:
             try:
                 nb_in = nbformat.read(f, nbformat.NO_CONVERT)
             except nbformat.reader.NotJSONError:
-                print('Not a valid notebook: {}'.format(input_file))
+                self.err_msg.append('Not a valid notebook: {}\n\n'.format(input_file))
                 return
         ep = ExecutePreprocessor(timeout=timeout, kernel_name='python3')
         try:
             nb_out = ep.preprocess(nb_in, {'metadata': {'path': path}})
         except CellExecutionError:
-            print('Failed to execute: {}'.format(input_file))
+            self.err_msg.append('Error executing the notebook "{}".\n\n'.format(input_file))
             return
         with open(output_file, 'w') as f:
             json.dump(self.clean_data(nb_out[0]), f, indent=2)   
+            # json.dump(nb_out[0], f, indent=2)
     
     def run_sols(self) -> dict:
         self.run_and_save(input_file = self.sols_file, 
@@ -89,7 +100,7 @@ class grader():
                     continue
                 self.run_student(os.path.join(root, name))
     
-    def grade(self, is_run: bool):
+    def grade(self, is_run: bool = True):
         if is_run:
             self.run()
         grades = {}
@@ -102,7 +113,7 @@ class grader():
                     try:
                         student_ans = json.load(f)
                     except json.decoder.JSONDecodeError:
-                        print('Invalid json file: {}'.format(os.path.join(root, name)))
+                        self.err_msg.append('Invalid JSON file "{}".\n\n'.format(os.path.join(root, name)))
                         continue
                 student_id = os.path.splitext(name)[0]
                 grades[student_id] = {}
@@ -117,8 +128,11 @@ class grader():
                 grades[student_id]['score'] /= (sum(self.score.values()) / 100)
         with open('grades.json', 'w') as f:
             json.dump(grades, f, indent=2)
+            
+        # save all error messages
+        self.save_err_msg()
         
 if __name__ == '__main__':
     score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10, 'Q9': 10, 'Q10': 10}
     g = grader(student_dir='lab1', sols_dir='sols', sols_file='sols/lab01-ans-2021.ipynb', score=score)
-    g.grade(is_run=False)
+    g.grade(is_run=True)

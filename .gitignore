@@ -5,3 +5,4 @@ grades.json
 nbconvert.pdf
 output.json
 .DS_Store
+error.txt
