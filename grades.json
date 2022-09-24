@@ -1,16 +1,4 @@
 {
-  "junxiang.22@intl.zju.edu.cn": {
-    "score": 0,
-    "feedback": "Invalid file"
-  },
-  "jinghui.22@intl.zju.edu.cn": {
-    "score": 0,
-    "feedback": "Invalid file"
-  },
-  "jiaxin.22@intl.zju.edu.cn": {
-    "score": 0,
-    "feedback": "Invalid file"
-  },
   "jinnan.22@intl.zju.edu.cn": {
     "score": 70,
     "feedback": "Q6: wrong answer; Q7: wrong answer; Q8: wrong answer; "
@@ -23,11 +11,19 @@
     "score": 100,
     "feedback": ""
   },
+  "jinghui.22@intl.zju.edu.cn": {
+    "score": 90,
+    "feedback": "Q6: wrong answer; "
+  },
   "keyi.22@intl.zju.edu.cn": {
     "score": 100,
     "feedback": ""
   },
   "jinyang.22@intl.zju.edu.cn": {
+    "score": 100,
+    "feedback": ""
+  },
+  "junxiang.22@intl.zju.edu.cn": {
     "score": 100,
     "feedback": ""
   },
@@ -76,6 +72,10 @@
     "feedback": ""
   },
   "jihao.22@intl.zju.edu.cn": {
+    "score": 100,
+    "feedback": ""
+  },
+  "jiaxin.22@intl.zju.edu.cn": {
     "score": 100,
     "feedback": ""
   },
