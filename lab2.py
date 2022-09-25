@@ -30,9 +30,14 @@ class lab2_grader():
                 self.grades[student_id]['score'] = 0
                 self.grades[student_id]['feedback'] = "Invalid file"
                 return
+        # remove empty cells
+        non_empty_cells = []
+        for cell in nb_in['cells']:
+            if cell['source'] != "":
+                non_empty_cells.append(cell)
         temp = []
-        # assert len(nb_in['cells']) == len(self.nb_ref['cells'])
-        for cell, cell_ref in zip(nb_in['cells'], self.nb_ref['cells']):
+        # assert len(non_empty_cells) == len(self.nb_ref['cells'])
+        for cell, cell_ref in zip(non_empty_cells, self.nb_ref['cells']):
             if cell_ref['cell_type'] == 'code':
                 if 'source' in cell_ref:
                     if 'points' in cell_ref['source'] or 'assert' in cell_ref['source'] \
@@ -129,6 +134,6 @@ class lab2_grader():
         
                 
 if __name__ == '__main__':
-    grader = lab2_grader('student_files/lab2')
+    grader = lab2_grader('student_files/xuanyu_chen')
     # grader.clean_data()
     grader.run()
