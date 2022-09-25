@@ -134,6 +134,6 @@ class lab2_grader():
         
                 
 if __name__ == '__main__':
-    grader = lab2_grader('student_files/xuanyu_chen')
+    grader = lab2_grader('student_files')
     # grader.clean_data()
     grader.run()
