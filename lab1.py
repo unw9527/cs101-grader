@@ -131,7 +131,7 @@ class grader():
                             self.grades[student_id]['feedback'] += '{}: wrong answer; '.format(qnum)
                 self.grades[student_id]['score'] /= sum(self.score.values())
                 self.grades[student_id]['score'] = int(self.grades[student_id]['score'] * 100) + 20
-        with open('grades.json', 'w') as f:
+        with open('grades/lab1_grades.json', 'w') as f:
             json.dump(self.grades, f, indent=2)
             
         # save all error messages
@@ -139,5 +139,5 @@ class grader():
         
 if __name__ == '__main__':
     score = {'Q1': 10, 'Q2': 10, 'Q3': 10, 'Q4': 10, 'Q5': 10, 'Q6': 10, 'Q7': 10, 'Q8': 10, 'Q9': 10, 'Q10': 10}
-    g = grader(student_dir='lab1', sols_dir='sols', sols_file='sols/lab01-ans-2021.ipynb', score=score)
+    g = grader(student_dir='student_files/lab1', sols_dir='sols', sols_file='sols/lab01-ans-2021.ipynb', score=score)
     g.grade(is_run=True)

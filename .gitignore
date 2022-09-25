@@ -1,7 +1,9 @@
 *@intl.zju.edu.cn*.ipynb
-output
+student_files/*
+debug.ipynb
 sols
 nbconvert.pdf
-output.json
+*.json
 .DS_Store
-error.txt
+*clean/*
+__pycache__/*

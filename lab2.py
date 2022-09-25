@@ -14,7 +14,7 @@ class lab2_grader():
         with open('sols/lab2-2021-ans.ipynb', 'r') as f:
             nb_ref = nbformat.read(f, nbformat.NO_CONVERT)
         self.nb_ref = nb_ref
-        with open('lab2_sol_clean.json', 'r') as f:
+        with open('sols/lab2_sol_clean.json', 'r') as f:
             nb_ref_clean = json.load(f)
         self.nb_ref_clean = nb_ref_clean
         self.grades = {}
@@ -40,9 +40,9 @@ class lab2_grader():
                             or 'definition' in cell_ref['source']:
                         temp.append(cell)
         nb_in['cells'] = temp
-        if not os.path.exists('lab2_clean'):
-            os.makedirs('lab2_clean')
-        with open(os.path.join('lab2_clean', os.path.splitext(os.path.basename(filename))[0]+ '_clean' + '.ipynb'), 'w') as f:
+        if not os.path.exists(os.path.join(self.student_folder + '_clean')):
+            os.makedirs(os.path.join(self.student_folder + '_clean'))
+        with open(os.path.join(os.path.join(self.student_folder + '_clean'), os.path.splitext(os.path.basename(filename))[0]+ '_clean' + '.ipynb'), 'w') as f:
             nbformat.write(nb_in, f)
         return [student_id, nb_in]
     
@@ -53,7 +53,10 @@ class lab2_grader():
             for name in tqdm(files):
                 if 'checkpoint' in name:
                     continue
-                student_id, nb = self.rm_redundant_cells(os.path.join(root, name))
+                try:
+                    student_id, nb = self.rm_redundant_cells(os.path.join(root, name))
+                except TypeError:
+                    continue
                 cleaned_student_files[student_id] = nb
         return cleaned_student_files
 
@@ -107,7 +110,7 @@ class lab2_grader():
         for student_id in tqdm(cleaned_student_files):
             ep = ExecutePreprocessor(timeout=600, kernel_name='python3', allow_errors=True)
             try:
-                nb_out = ep.preprocess(cleaned_student_files[student_id], {'metadata': {'path': 'lab2_clean'}})
+                nb_out = ep.preprocess(cleaned_student_files[student_id], {'metadata': {'path': '{}'.format(os.path.join(self.student_folder + '_clean'))}})
             except CellExecutionError:
                 self.err_msg.append('Error executing the notebook "{}".\n\n'.format(cleaned_student_files[student_id]))
                 return
@@ -119,13 +122,13 @@ class lab2_grader():
         for student in sorted_students:
             sorted_grades[student] = self.grades[student]
             
-        with open('lab2_grades.json', 'w') as f:
+        with open('grades/lab2_grades.json', 'w') as f:
             json.dump(sorted_grades, f, indent=2)
         if self.err_msg != []:
             print("Error: ", self.err_msg)
         
                 
 if __name__ == '__main__':
-    grader = lab2_grader('lab2')
+    grader = lab2_grader('student_files/lab2')
     # grader.clean_data()
     grader.run()
