@@ -31,6 +31,7 @@ class lab2_grader():
                 self.grades[student_id]['feedback'] = "Invalid file"
                 return
         temp = []
+        # assert len(nb_in['cells']) == len(self.nb_ref['cells'])
         for cell, cell_ref in zip(nb_in['cells'], self.nb_ref['cells']):
             if cell_ref['cell_type'] == 'code':
                 if 'source' in cell_ref:
@@ -93,7 +94,13 @@ class lab2_grader():
                 if flag:    
                     self.grades[student_id]['score'] += points
                 else:
-                    self.grades[student_id]['feedback'] += '{}: wrong answer; '.format(q_num)
+                    msg = '{}: wrong answer; '.format(q_num)
+                    if msg in self.grades[student_id]['feedback']:
+                        # Student submitted an empty file
+                        self.grades[student_id]['score'] = 0
+                        self.grades[student_id]['feedback'] = 'Invalid file!'
+                        return
+                    self.grades[student_id]['feedback'] += msg
     def run(self):
         # print('Grading...')
         cleaned_student_files = self.clean_data()
