@@ -102,7 +102,6 @@ class lab2_grader():
                         return
                     self.grades[student_id]['feedback'] += msg
     def run(self):
-        # print('Grading...')
         cleaned_student_files = self.clean_data()
         print('Grading...')
         for student_id in tqdm(cleaned_student_files):
@@ -113,8 +112,15 @@ class lab2_grader():
                 self.err_msg.append('Error executing the notebook "{}".\n\n'.format(cleaned_student_files[student_id]))
                 return
             self.grade(nb_out[0], student_id)
+            
+        # Sort the students alphabetically
+        sorted_grades = {}
+        sorted_students = sorted(self.grades.keys())
+        for student in sorted_students:
+            sorted_grades[student] = self.grades[student]
+            
         with open('lab2_grades.json', 'w') as f:
-            json.dump(self.grades, f, indent=2)
+            json.dump(sorted_grades, f, indent=2)
         if self.err_msg != []:
             print("Error: ", self.err_msg)
         
