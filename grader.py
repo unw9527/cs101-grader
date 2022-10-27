@@ -2,6 +2,7 @@ import nbformat
 import os
 from nbclient.exceptions import CellExecutionError
 from nbconvert.preprocessors import ExecutePreprocessor
+from tqdm import tqdm
 
 class Grader:
     def __init__(self, num_q: int, student_dir: str, test_file: str):
@@ -14,7 +15,7 @@ class Grader:
         self.tests = tests['cells']
     
     
-    def clean_and_add_tests(self, filename: str, num_q: int) -> nbformat.notebooknode.NotebookNode:
+    def clean_and_add_tests(self, filename: str) -> nbformat.notebooknode.NotebookNode:
         """Remove redundant cells in a notebook.
 
         Args:
@@ -40,16 +41,20 @@ class Grader:
                 nb_raw = nbformat.read(f, nbformat.NO_CONVERT)
             except nbformat.reader.NotJSONError:
                 self.err_msg += 'Not a valid notebook: {}\n'.format(filename)
+                print('not a valid notebook')
                 return nb_cleaned
             
         # Only keep the cells that are questions
         for cell in nb_raw['cells']:
             if 'metadata' in cell and 'question' in cell['metadata']:
                 nb_cleaned['cells'].append(nbformat.from_dict(cell))
+        # if nb_cleaned['cells'] == []:
+        #     print('empty')
                 
         # Check whether the number of questions is correct
         if len(nb_cleaned['cells']) != self.num_q:
             self.err_msg += 'Incorrect number of questions: {}\n'.format(filename)
+            print('incorrect number of questions')
             return nb_cleaned
         
         # Copy the metadata
@@ -60,10 +65,12 @@ class Grader:
         nb_cleaned['cells'].insert(0, nbformat.from_dict(student_info))
         
         nb_cleaned['cells'].insert(0, nbformat.from_dict(self.tests[0])) ### Forgot to mark this cell...
-        self.tests.pop(0)
+        # self.tests.pop(0)
         
         # Add tests
         for cell in self.tests:
+            if cell == self.tests[0]:
+                continue
             nb_cleaned['cells'].append(nbformat.from_dict(cell))
             
         return nb_cleaned
@@ -74,7 +81,7 @@ class Grader:
         Args:
             filename (str): path to the notebook
         """
-        nb_cleaned = self.clean_and_add_tests(filename, self.num_q)
+        nb_cleaned = self.clean_and_add_tests(filename)
         ep = ExecutePreprocessor(timeout=600, kernel_name='python3', allow_errors=True)
         nb_cleaned = nbformat.from_dict(nb_cleaned)
         try:
@@ -89,13 +96,17 @@ class Grader:
     def grading(self) -> None:
         """Grade all files
         """
-        for student_file in os.listdir(self.student_dir):
-            self.execute(os.path.join(self.student_dir, student_file))
+        # for student_file in tqdm(os.listdir(self.student_dir)):
+        #     self.execute(os.path.join(self.student_dir, student_file))
+        for root, dirs, filenames in os.walk(self.student_dir):
+            for filename in tqdm(filenames):
+                self.execute(os.path.join(root, filename))
         if self.err_msg is not '':
             print("Here are files that fail to be graded: ")
             print(self.err_msg)
                 
 if __name__ == "__main__":
-    g = Grader(4, 'student_files/lab4', 'lab4_test.ipynb')
+    g = Grader(4, 'student_files/lab04', 'lab4_test.ipynb')
     g.grading()
+    
     
