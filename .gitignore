@@ -7,3 +7,4 @@ nbconvert.pdf
 .DS_Store
 *clean/*
 __pycache__/*
+grades
