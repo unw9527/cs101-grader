@@ -1,7 +1,5 @@
 import json
 import os
-from queue import Empty
-from xml.etree.ElementTree import QName
 import nbformat
 from nbclient.exceptions import CellExecutionError
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -134,6 +132,6 @@ class lab2_grader():
         
                 
 if __name__ == '__main__':
-    grader = lab2_grader('student_files')
+    grader = lab2_grader('student_files/lab2')
     # grader.clean_data()
     grader.run()
