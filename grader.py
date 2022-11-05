@@ -39,9 +39,9 @@ class Grader:
         with open(filename, 'r') as f:
             try:
                 nb_raw = nbformat.read(f, nbformat.NO_CONVERT)
-            except nbformat.reader.NotJSONError:
+            except (nbformat.reader.NotJSONError, UnicodeDecodeError):
                 self.err_msg += 'Not a valid notebook: {}\n'.format(filename)
-                print('not a valid notebook')
+                # print('not a valid notebook')
                 return nb_cleaned
             
         # Only keep the cells that are questions
@@ -99,14 +99,16 @@ class Grader:
         # for student_file in tqdm(os.listdir(self.student_dir)):
         #     self.execute(os.path.join(self.student_dir, student_file))
         for root, dirs, filenames in os.walk(self.student_dir):
+            print(root)
             for filename in tqdm(filenames):
-                self.execute(os.path.join(root, filename))
+                if filename.endswith('.ipynb'):
+                    self.execute(os.path.join(root, filename))
         if self.err_msg is not '':
             print("Here are files that fail to be graded: ")
             print(self.err_msg)
                 
 if __name__ == "__main__":
-    g = Grader(4, 'student_files/lab04', 'lab4_test.ipynb')
+    g = Grader(6, 'student_files/lab05', 'lab5_test.ipynb')
     g.grading()
     
     
