@@ -7,3 +7,4 @@ sols
 *clean/*
 __pycache__/*
 *.csv
+*.tsv
