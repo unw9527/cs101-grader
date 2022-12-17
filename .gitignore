@@ -1,9 +1,0 @@
-student_files/*
-*.ipynb
-sols
-*.pdf
-*.json
-.DS_Store
-*clean/*
-__pycache__/*
-*.csv
