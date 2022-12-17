@@ -1,10 +1,9 @@
-*@intl.zju.edu.cn*.ipynb
 student_files/*
-debug.ipynb
+*.ipynb
 sols
-nbconvert.pdf
+*.pdf
 *.json
 .DS_Store
 *clean/*
 __pycache__/*
-grades
+*.csv
