@@ -46,7 +46,7 @@ class Grader:
             
         # Only keep the cells that are questions
         for cell in nb_raw['cells']:
-            if 'metadata' in cell and 'question' in cell['metadata']:
+            if 'metadata' in cell and 'autograding' in cell['metadata']:
                 nb_cleaned['cells'].append(nbformat.from_dict(cell))
         # if nb_cleaned['cells'] == []:
         #     print('empty')
@@ -54,7 +54,7 @@ class Grader:
         # Check whether the number of questions is correct
         if len(nb_cleaned['cells']) != self.num_q:
             self.err_msg += 'Incorrect number of questions: {}\n'.format(filename)
-            print('incorrect number of questions')
+            print('Incorrect number of questions: expect {}, get {}'.format(self.num_q, len(nb_cleaned['cells'])))
             return nb_cleaned
         
         # Copy the metadata
@@ -108,7 +108,7 @@ class Grader:
             print(self.err_msg)
                 
 if __name__ == "__main__":
-    g = Grader(6, 'student_files/lab05', 'lab5_test.ipynb')
+    g = Grader(6, 'student_files/lab09', 'lab9_test.ipynb')
     g.grading()
     
     
