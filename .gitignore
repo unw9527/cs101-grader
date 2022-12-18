@@ -8,3 +8,6 @@ sols
 __pycache__/*
 *.csv
 *.tsv
+lab1.py
+lab2.py
+clean_all.py
