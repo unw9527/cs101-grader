@@ -103,7 +103,7 @@ class Grader:
             for filename in tqdm(filenames):
                 if filename.endswith('.ipynb'):
                     self.execute(os.path.join(root, filename))
-        if self.err_msg is not '':
+        if self.err_msg != '':
             print("Here are files that fail to be graded: ")
             print(self.err_msg)
                 
